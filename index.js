@@ -7,6 +7,7 @@ const fs = require("fs");
 const connectDb = require("./config/dbConnection");
 
 connectDb();
+// console.log("Database connected successfully");
 const app = express();
 app.use(
   cors({
@@ -61,7 +62,7 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 
 app.use("/health", (req, res) => res.send(`Welcome to the server`));
 app.use("/api/admin", require("./routes/adminRoutes"));
-// app.use("/api/general", require("./routes/generalRoutes"));
+app.use("/api/general", require("./routes/generalRoutes"));
 
 
 app.listen(port, () => {

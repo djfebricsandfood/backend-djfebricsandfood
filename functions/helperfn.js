@@ -2,8 +2,6 @@
 const fs = require('fs');
 const path = require('path');
 
-
-
 module.exports.deleteImageFile = (imagePath) => {
   if (imagePath) {
     const fullPath = path.join('./public', imagePath);
@@ -17,7 +15,6 @@ module.exports.deleteImageFile = (imagePath) => {
     }
   }
 };
-
 
 module.exports.validateBlogData = (heading, description) => {
   const errors = [];
@@ -36,8 +33,6 @@ module.exports.validateBlogData = (heading, description) => {
   
   return errors;
 };
-
-
 
  module.exports.validateCarouselData = (name, heading, subheading) => {
   const errors = [];

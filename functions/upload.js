@@ -9,7 +9,7 @@ const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
 const THUMBNAIL_WIDTH = 300;
 const UPLOADS_BASE_PATH = './public/uploads';
 
-// Supported image MIME types
+
 const ALLOWED_IMAGE_TYPES = [
   'image/jpeg',
   'image/jpg', 
@@ -69,7 +69,7 @@ const storage = multer.diskStorage({
   }
 });
 
-// File filter for images only
+
 const imageFileFilter = (req, file, cb) => {
   console.log('Processing file:', {
     fieldname: file.fieldname,

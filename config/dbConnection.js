@@ -10,6 +10,8 @@ const connectDb = async () => {
   try {
     const  connection  = await mongoose.connect(process.env.CONNECTION_STRING);
 
+    console.log("Database connected successfully");
+
     const [checkAdmin] = await Promise.all([Admin.countDocuments()]);
 
     if (!checkAdmin) {

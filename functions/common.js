@@ -11,7 +11,7 @@ module.exports.createLog = (logName) => {
   }
 };
 
-
+  
 module.exports.generateRandomOTP = () => {
   try {
     const digits = "0123456789";
