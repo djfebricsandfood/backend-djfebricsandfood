@@ -58,6 +58,7 @@ app.use(express.urlencoded({ extended: true, limit: "30mb" }));
 const directory = path.join(__dirname, "public");
 app.use(express.static(directory));
 
+
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 app.use("/health", (req, res) => res.send(`Welcome to the server`));

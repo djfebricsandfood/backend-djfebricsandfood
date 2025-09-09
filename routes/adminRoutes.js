@@ -1,6 +1,6 @@
 const express = require("express");
 const validateAdminToken = require("../middleware/adminValidateToken");
-const { sendLoginOTP, validateOTP, resendOTP, logOut, testAdmin, createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, createBlogPost, getAllBlogPost, getBlogPostById, updateBlogPost, deleteSingleBLogPost, updateCrousel, deleteCrousel, createCarousel, getCarouselById, getAllCrousel , createGalleryImage } = require("../controller/adminController");
+const { sendLoginOTP, validateOTP, resendOTP, logOut, testAdmin, createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, createBlogPost, getAllBlogPost, getBlogPostById, updateBlogPost, deleteSingleBLogPost, updateCrousel, deleteCrousel, createCarousel, getCarouselById, getAllCrousel , createGalleryImage, getAllContacts } = require("../controller/adminController");
 const { loginData } = require("../validation/validator");
 const { handleMulterUpload } = require("../functions/upload");
 
@@ -48,6 +48,8 @@ router.get("/get-carousel-by-id/:id", validateAdminToken, getCarouselById);
 router.get("/get-all-carousel", validateAdminToken, getAllCrousel);
 
 router.post("/create-gallery" , validateAdminToken ,  handleMulterUpload , createGalleryImage )
+
+router.get("/get-all-quries" , validateAdminToken , getAllContacts)
 
 
 

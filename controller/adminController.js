@@ -16,6 +16,7 @@ const path = require("path");
 const Blog = require("../models/blogModel");
 const { deleteImageFile, validateBlogData, validateCarouselData } = require("../functions/helperfn");
 const CarouselSection = require("../models/carouselSection");
+const contactModel = require("../models/contactModel");
 
 
 const sendLoginOTP = async (req, res) => {
@@ -197,113 +198,114 @@ const testAdmin = async (req, res) => {
 
 
 const createProduct = async (req, res) => {
-  try {
-   
+    try {
     
-    if (req.fileValidationError) {
-      return res.status(400).json({
-        success: false,
-        message: req.fileValidationError
-      });
-    }
-
-    const { name, description } = req.body;
-
-    if (!name || !description) {
-      return res.status(400).json({
-        success: false,
-        message: 'Name and description are required fields'
-      });
-    }
-
-    let mainImages = [];
-    if (req.files && req.files.images) {
-      mainImages = req.files.images.map(file => {
-        return path.join('uploads/products/main', file.filename).replace(/\\/g, '/');
-      });
-    }
-
-    let subProducts = [];
-    let subProductsData = [];
-
-    if (req.body.subProducts) {
-      try {
-        subProductsData = typeof req.body.subProducts === 'string'
-          ? JSON.parse(req.body.subProducts)
-          : req.body.subProducts;
-      } catch (error) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid sub-products data format'
-        });
-      }
-    }
-
-    if (req.files && req.files.subProducts && subProductsData.length > 0) {
-      const subProductImages = req.files.subProducts;
       
-
-      if (subProductImages.length !== subProductsData.length) {
+      if (req.fileValidationError) {
         return res.status(400).json({
           success: false,
-          message: 'Number of sub-product images must match number of sub-products'
+          message: req.fileValidationError
         });
       }
 
-      subProducts = subProductsData.map((subProduct, index) => {
-        if (!subProduct.name) {
-          throw new Error(`Sub-product ${index + 1} name is required`);
+      const { name, description , category } = req.body;
+
+      if (!name || !description) {
+        return res.status(400).json({
+          success: false,
+          message: 'Name and description are required fields'
+        });
+      }
+
+      let mainImages = [];
+      if (req.files && req.files.images) {
+        mainImages = req.files.images.map(file => {
+          return path.join('uploads/products/main', file.filename).replace(/\\/g, '/');
+        });
+      }
+
+      let subProducts = [];
+      let subProductsData = [];
+
+      if (req.body.subProducts) {
+        try {
+          subProductsData = typeof req.body.subProducts === 'string'
+            ? JSON.parse(req.body.subProducts)
+            : req.body.subProducts;
+        } catch (error) {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid sub-products data format'
+          });
+        }
+      }
+
+      if (req.files && req.files.subProducts && subProductsData.length > 0) {
+        const subProductImages = req.files.subProducts;
+        
+
+        if (subProductImages.length !== subProductsData.length) {
+          return res.status(400).json({
+            success: false,
+            message: 'Number of sub-product images must match number of sub-products'
+          });
         }
 
-        return {
-          name: subProduct.name,
-          image: path.join('uploads/products/sub', subProductImages[index].filename).replace(/\\/g, '/'),
-          createdAt: new Date()
-        };
-      });
-    } else if (subProductsData.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Sub-product images are required when sub-products are provided'
-      });
-    }
+        subProducts = subProductsData.map((subProduct, index) => {
+          if (!subProduct.name) {
+            throw new Error(`Sub-product ${index + 1} name is required`);
+          }
 
-    const newProduct = new product({
-      name: name.trim(),
-      description: description.trim(),
-      images: mainImages,
-      subProducts: subProducts,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
-
-    const savedProduct = await newProduct.save();
-
-    res.status(201).json({
-      success: true,
-      message: 'Product created successfully',
-      data: {
-        product: savedProduct,
-        imageCount: mainImages.length,
-        subProductCount: subProducts.length
+          return {
+            name: subProduct.name,
+            image: path.join('uploads/products/sub', subProductImages[index].filename).replace(/\\/g, '/'),
+            createdAt: new Date()
+          };
+        });
+      } else if (subProductsData.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Sub-product images are required when sub-products are provided'
+        });
       }
-    });
 
-  } catch (error) {
-    console.error('Product creation error:', error);
+      const newProduct = new product({
+        name: name.trim(),
+        description: description.trim(),
+        category: category,
+        images: mainImages,
+        subProducts: subProducts,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
 
-    if (error.code === 11000) {
-      return res.status(409).json({
+      const savedProduct = await newProduct.save();
+
+      res.status(201).json({
+        success: true,
+        message: 'Product created successfully',
+        data: {
+          product: savedProduct,
+          imageCount: mainImages.length,
+          subProductCount: subProducts.length
+        }
+      });
+
+    } catch (error) {
+      console.error('Product creation error:', error);
+
+      if (error.code === 11000) {
+        return res.status(409).json({
+          success: false,
+          message: 'Product with this name already exists'
+        });
+      }
+
+      res.status(500).json({
         success: false,
-        message: 'Product with this name already exists'
+        message: 'Internal server error occurred while creating product'
       });
     }
-
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error occurred while creating product'
-    });
-  }
 };
 
 
@@ -317,7 +319,7 @@ const getAllProducts = async (req, res) => {
     const searchQuery = search
       ? {
           $and: [
-            { isDeleted: { $ne: true } }, // ✅ Added isDeleted check
+            { isDeleted: { $ne: true } }, 
             {
               $or: [
                 { name: { $regex: search, $options: 'i' } },
@@ -326,7 +328,7 @@ const getAllProducts = async (req, res) => {
             }
           ]
         }
-      : { isDeleted: { $ne: true } }; // ✅ Added isDeleted check for non-search queries
+      : { isDeleted: { $ne: true } }; 
     
     const totalProducts = await product.countDocuments(searchQuery);
     
@@ -448,22 +450,25 @@ const updateProduct = async (req, res) => {
       });
     }
 
-    const { name, description } = req.body;
+    const { name, description , category } = req.body;
 
-    // Prepare update data
     const updateData = {
       updatedAt: new Date()
     };
 
-    // Update name if provided
     if (name) {
       updateData.name = name.trim();
     }
 
-    // Update description if provided
     if (description) {
       updateData.description = description.trim();
     }
+
+    if(category){
+      updateData.category = category;
+    }
+
+
 
     // Handle main images update
     if (req.files && req.files.images && req.files.images.length > 0) {
@@ -472,9 +477,7 @@ const updateProduct = async (req, res) => {
       });
       updateData.images = mainImages;
     }
-    // If no new images uploaded, preserve existing images (don't update images field)
-
-    // Handle sub-products update
+   
     let subProductsData = [];
     if (req.body.subProducts) {
       try {
@@ -490,17 +493,16 @@ const updateProduct = async (req, res) => {
 
       let subProducts = [];
 
-      // Check if new images are being uploaded
+   
       const hasNewImages = req.files && req.files.subProducts && req.files.subProducts.length > 0;
 
       if (hasNewImages) {
         const subProductImages = req.files.subProducts;
 
-        // Create a map of image indices to filenames for flexible assignment
+
         const imageMap = {};
         subProductImages.forEach((file, index) => {
-          // Use the fieldname to determine which sub-product this image belongs to
-          // Expected format: subProducts[0], subProducts[1], etc.
+         
           const match = file.fieldname.match(/subProducts\[(\d+)\]/);
           if (match) {
             const subProductIndex = parseInt(match[1]);
@@ -516,14 +518,14 @@ const updateProduct = async (req, res) => {
           const existingSubProduct = existingProduct.subProducts && existingProduct.subProducts[index];
           let imageUrl = '';
 
-          // Use new image if provided, otherwise keep existing image
+         
           if (imageMap.hasOwnProperty(index)) {
             imageUrl = path.join('uploads/products/sub', imageMap[index]).replace(/\\/g, '/');
           } else if (subProduct.image) {
-            // Use image from request body if provided
+         
             imageUrl = subProduct.image;
           } else if (existingSubProduct && existingSubProduct.image) {
-            // Keep existing image
+           
             imageUrl = existingSubProduct.image;
           }
 
@@ -534,7 +536,7 @@ const updateProduct = async (req, res) => {
           };
         });
       } else {
-        // No new images uploaded, preserve existing images and update other fields
+       
         subProducts = subProductsData.map((subProduct, index) => {
           if (!subProduct.name) {
             throw new Error(`Sub-product ${index + 1} name is required`);
@@ -553,13 +555,13 @@ const updateProduct = async (req, res) => {
       updateData.subProducts = subProducts;
     }
 
-    // Update the product
+    
     const updatedProduct = await product.findByIdAndUpdate(
       id,
       updateData,
       { 
-        new: true, // Return updated document
-        runValidators: true // Run schema validators
+        new: true, 
+        runValidators: true 
       }
     );
 
@@ -696,7 +698,7 @@ const createBlogPost = async (req, res) => {
     let imagePath = null;
     if (req.files && req.files.images && req.files.images.length > 0) {
       const imageFile = req.files.images[0]; // Take only the first image
-      imagePath = imageFile.path.replace('./public', ''); // Remove public prefix for storing in DB
+      imagePath = imageFile.path.replace(/^\.?\\?public\\?/, ''); // Remove public prefix for storing in DB
     }
     
     // Create new blog
@@ -1109,7 +1111,7 @@ const createCarousel = async (req, res) => {
     }
 
     const backgroundImageFile = req.files.images[0]; 
-    const backgroundImagePath = backgroundImageFile.path.replace('./public', ''); 
+    const backgroundImagePath = backgroundImageFile.path.replace(/^(\.?[\\/])?public[\\/]/, '');
     
     const newSection = new CarouselSection({
       name: name.trim(),
@@ -1205,7 +1207,8 @@ const updateCrousel = async (req, res) => {
     if (req.files && req.files.images && req.files.images.length > 0) {
       
       const backgroundImageFile = req.files.images[0];
-      newBackgroundImagePath = backgroundImageFile.path.replace('./public', '');
+      newBackgroundImagePath = backgroundImageFile.path.replace(/^(\.?[\\/])?public[\\/]/, '');
+
 
       if (existingSection.backgroundImage) {
         deleteImageFile(existingSection.backgroundImage);
@@ -1639,6 +1642,63 @@ const createGalleryImage = async (req, res) => {
 };
 
 
+const getAllContacts = async (req, res) => {
+  try {
+    const contacts = await contactModel.find().sort({ createdAt: -1 }); // newest first
+
+    res.status(200).json({
+      success: true,
+      count: contacts.length,
+      data: contacts,
+    });
+  } catch (error) {
+    console.error("Error fetching contacts:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error while fetching contacts",
+    });
+  }
+};
+
+
+
+const sendMailToContact = async (req, res) => {
+  try {
+    const { contactId, templateName, mailVariable } = req.body;
+
+    if (!contactId || !templateName) {
+      return res.status(400).json({
+        success: false,
+        message: "Contact ID and template name are required",
+      });
+    }
+
+   
+    const contact = await contactModel.findById(contactId);
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        message: "Contact not found",
+      });
+    }
+
+  
+    await sendMail(templateName, mailVariable || {}, contact.email);
+
+    res.status(200).json({
+      success: true,
+      message: `Mail sent successfully to ${contact.email}`,
+    });
+  } catch (error) {
+    console.error("Error sending mail:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error while sending mail",
+    });
+  }
+};
+
+
 
 
 
@@ -1663,6 +1723,7 @@ module.exports = {
   createCarousel,
   getCarouselById,
   getAllCrousel,
-  createGalleryImage
-
+  createGalleryImage,
+  getAllContacts,
+  sendMailToContact
 };
