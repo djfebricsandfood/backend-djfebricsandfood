@@ -1,5 +1,7 @@
 const Blog = require("../models/blogModel");
+const categoryModel = require("../models/categoryModel");
 const contactModel = require("../models/contactModel");
+const homeProductModel = require("../models/homeProductModel");
 const product = require("../models/product");
 
 
@@ -166,6 +168,27 @@ const getAllBlogs = async (req, res) => {
 };
 
 
+const getCategory = async (req, res) => {
+  try {
+    const categories = await categoryModel.find();
+    res.status(200).json({ success: true, data: categories });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+
+ const getAllHomeProducts = async (req, res) => {
+  try {
+    const products = await homeProductModel.find().sort({ createdAt: -1 });
+    res.json({ success: true, count: products.length, data: products });
+  } catch (error) {
+    console.error("Get all products error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+
 
 
 
@@ -173,5 +196,7 @@ module.exports = {
   getAllProductsForUser,
   createContact,
   getProductById,
-  getAllBlogs
+  getAllBlogs,
+  getCategory,
+  getAllHomeProducts
 };

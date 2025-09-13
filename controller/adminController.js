@@ -1718,15 +1718,19 @@ const createHomeProduct =  async (req, res) => {
       });
     }
 
-    let imagePath = "";
-    if (req.files && req.files.images && req.files.images.length > 0) {
-      imagePath = req.files.images[0].path.replace(/\\/g, "/");
-    } else {
-      return res.status(400).json({
-        success: false,
-        message: "Image is required"
-      });
-    }
+let imagePath = "";
+
+if (req.files && req.files.images && req.files.images.length > 0) {
+  imagePath = req.files.images[0].path
+    .replace(/\\/g, "/")      // fix Windows slashes
+    .replace("public/", "");  // remove "public/"
+} else {
+  return res.status(400).json({
+    success: false,
+    message: "Image is required",
+  });
+}
+
 
     const newProduct = new HomeProductModel({
       image: imagePath,
