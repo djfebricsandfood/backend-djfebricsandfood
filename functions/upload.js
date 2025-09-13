@@ -56,7 +56,10 @@ const storage = multer.diskStorage({
       uploadPath = path.join(UPLOADS_BASE_PATH, 'products/main');
     } else if (file.fieldname === 'subProducts' || file.fieldname.startsWith('subProducts[')) {
       uploadPath = path.join(UPLOADS_BASE_PATH, 'products/sub');
-    } else {
+    }else if (file.fieldname === 'homeProductImage') {
+      uploadPath = path.join(UPLOADS_BASE_PATH, 'products/main');
+    }
+     else {
       // Default to main if fieldname is unclear
       uploadPath = path.join(UPLOADS_BASE_PATH, 'products/main');
     }

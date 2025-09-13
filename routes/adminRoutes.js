@@ -1,6 +1,6 @@
 const express = require("express");
 const validateAdminToken = require("../middleware/adminValidateToken");
-const { sendLoginOTP, validateOTP, resendOTP, logOut, testAdmin, createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, createBlogPost, getAllBlogPost, getBlogPostById, updateBlogPost, deleteSingleBLogPost, updateCrousel, deleteCrousel, createCarousel, getCarouselById, getAllCrousel , createGalleryImage, getAllContacts } = require("../controller/adminController");
+const { sendLoginOTP, validateOTP, resendOTP, logOut, testAdmin, createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, createBlogPost, getAllBlogPost, getBlogPostById, updateBlogPost, deleteSingleBLogPost, updateCrousel, deleteCrousel, createCarousel, getCarouselById, getAllCrousel , createGalleryImage, getAllContacts, createHomeProduct, updateHomeProduct, deleteHomeProduct, getAllHomeProducts } = require("../controller/adminController");
 const { loginData } = require("../validation/validator");
 const { handleMulterUpload } = require("../functions/upload");
 
@@ -50,6 +50,16 @@ router.get("/get-all-carousel", validateAdminToken, getAllCrousel);
 router.post("/create-gallery" , validateAdminToken ,  handleMulterUpload , createGalleryImage )
 
 router.get("/get-all-quries" , validateAdminToken , getAllContacts)
+
+
+router.post("/create-home-product" , validateAdminToken , handleMulterUpload , createHomeProduct)
+
+router.patch("/update-home-product/:id" , validateAdminToken , handleMulterUpload , updateHomeProduct)
+
+router.patch("/delete-home-product/:id" , validateAdminToken , deleteHomeProduct)
+
+
+router.get("/get-all-home-products" , validateAdminToken , getAllHomeProducts)
 
 
 

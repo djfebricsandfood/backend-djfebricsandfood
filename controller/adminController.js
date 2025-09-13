@@ -17,6 +17,8 @@ const Blog = require("../models/blogModel");
 const { deleteImageFile, validateBlogData, validateCarouselData } = require("../functions/helperfn");
 const CarouselSection = require("../models/carouselSection");
 const contactModel = require("../models/contactModel");
+const  HomeProductModel  = require("../models/homeProductModel");
+
 
 
 const sendLoginOTP = async (req, res) => {
@@ -1700,6 +1702,111 @@ const sendMailToContact = async (req, res) => {
 
 
 
+const createHomeProduct =  async (req, res) => {
+  try {
+    if (req.fileValidationError) {
+      return res.status(400).json({ success: false, message: req.fileValidationError });
+    }
+
+    const { heading, description } = req.body;
+
+    if (!heading || !description) {
+      return res.status(400).json({
+        success: false,
+        message: "Heading and description are required",
+      });
+    }
+
+    let imagePath = "";
+    if (req.files && req.files.images && req.files.images.length > 0) {
+      imagePath = req.files.images[0].path.replace(/\\/g, "/");
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Image is required"
+      });
+    }
+
+    const newProduct = new HomeProductModel({
+      image: imagePath,
+      heading: heading.trim(),
+      description: description.trim(),
+    });
+
+    const savedProduct = await newProduct.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Product created successfully",
+      data: savedProduct,
+    });
+  } catch (error) {
+    console.error("Product creation error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+
+const updateHomeProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    let updateData = {
+      heading: req.body.heading,
+      description: req.body.description,
+    };
+
+    // If new image uploaded, replace it
+    if (req.file) {
+      updateData.image = path.join("uploads/products", req.file.filename).replace(/\\/g, "/");
+    }
+
+    const updatedProduct = await homeProductModel.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedProduct) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    res.json({ success: true, message: "Product updated successfully", data: updatedProduct });
+  } catch (error) {
+    console.error("Product update error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+
+const deleteHomeProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedProduct = await HomeProductModel.findByIdAndDelete(id);
+
+    if (!deletedProduct) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    res.json({ success: true, message: "Product deleted successfully" });
+  } catch (error) {
+    console.error("Product delete error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+
+
+ const getAllHomeProducts = async (req, res) => {
+  try {
+    const products = await HomeProductModel.find().sort({ createdAt: -1 });
+    res.json({ success: true, count: products.length, data: products });
+  } catch (error) {
+    console.error("Get all products error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 
 
 module.exports = {
@@ -1725,5 +1832,9 @@ module.exports = {
   getAllCrousel,
   createGalleryImage,
   getAllContacts,
-  sendMailToContact
+  sendMailToContact,
+  createHomeProduct,
+  updateHomeProduct,
+  deleteHomeProduct,
+  getAllHomeProducts
 };
