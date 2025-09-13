@@ -1,11 +1,16 @@
+const Blog = require("../models/blogModel");
 const contactModel = require("../models/contactModel");
 const product = require("../models/product");
 
 
 const getAllProductsForUser = async (req, res) => {
+  let category = req.params.category;
+   
+  
+  
   try {
     const products = await product.aggregate([
-      { $match: { isDeleted: { $ne: true } } },
+      { $match: { category: category } },
       { $sort: { createdAt: -1 } },
       { 
         $project: { 
@@ -14,10 +19,14 @@ const getAllProductsForUser = async (req, res) => {
           price: 1, 
           images: 1, 
           description: 1,
-          subProducts:1
+          subProducts:1,
+          category: 1
         } 
       }
     ]);
+
+
+    console.log('Get all products (user) response:', products);
 
     res.status(200).json({
       success: true,
@@ -38,6 +47,9 @@ const createContact = async (req, res) => {
   try {
     
     const { name, email, number, city, country, message } = req.body;
+
+
+
    
     if (!name || !email || !number || !city || !country || !message) {
       return res.status(400).json({
@@ -74,8 +86,92 @@ const createContact = async (req, res) => {
 
 
 
+const getProductById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Validate id early to avoid unnecessary DB calls
+    if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid product ID format',
+      });
+    }
+
+    // Use findById with lean() for faster, read-only query
+    const productData = await product.findById(id, {
+      _id: 1,
+      name: 1,
+      price: 1,
+      images: 1,
+      description: 1,
+      subProducts: 1,
+      category: 1,
+      createdAt: 1
+    }).lean();
+
+    if (!productData) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found',
+      });
+    }
+
+    console.log('Get product by ID response:', productData);
+
+    res.status(200).json({
+      success: true,
+      message: 'Product retrieved successfully',
+      data: productData,
+    });
+  } catch (error) {
+    console.error('Get product by ID error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error occurred while fetching product',
+    });
+  }
+};
+
+
+
+
+const getAllBlogs = async (req, res) => {
+  try {
+    const blogs = await Blog.find(
+      { isDeleted: false }, // ✅ skip deleted blogs
+      {
+        _id: 1,
+        heading: 1,
+        description: 1,
+        image: 1,
+        createdAt: 1,
+      }
+    )
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.status(200).json({
+      success: true,
+      message: "Blogs retrieved successfully",
+      data: blogs,
+    });
+  } catch (error) {
+    console.error("Get all blogs error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error occurred while fetching blogs",
+    });
+  }
+};
+
+
+
+
 
 module.exports = {
   getAllProductsForUser,
-  createContact
+  createContact,
+  getProductById,
+  getAllBlogs
 };
