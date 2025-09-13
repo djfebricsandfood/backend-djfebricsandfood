@@ -26,7 +26,7 @@ const getAllProductsForUser = async (req, res) => {
     ]);
 
 
-    console.log('Get all products (user) response:', products);
+    
 
     res.status(200).json({
       success: true,

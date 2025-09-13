@@ -1,6 +1,6 @@
 const express = require("express");
 const validateAdminToken = require("../middleware/adminValidateToken");
-const { sendLoginOTP, validateOTP, resendOTP, logOut, testAdmin, createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, createBlogPost, getAllBlogPost, getBlogPostById, updateBlogPost, deleteSingleBLogPost, updateCrousel, deleteCrousel, createCarousel, getCarouselById, getAllCrousel , createGalleryImage, getAllContacts, createHomeProduct, updateHomeProduct, deleteHomeProduct, getAllHomeProducts } = require("../controller/adminController");
+const { sendLoginOTP, validateOTP, resendOTP, logOut, testAdmin, createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, createBlogPost, getAllBlogPost, getBlogPostById, updateBlogPost, deleteSingleBLogPost, updateCrousel, deleteCrousel, createCarousel, getCarouselById, getAllCrousel , createGalleryImage, getAllContacts, createHomeProduct, updateHomeProduct, deleteHomeProduct, getAllHomeProducts, addCategory, getCategory } = require("../controller/adminController");
 const { loginData } = require("../validation/validator");
 const { handleMulterUpload } = require("../functions/upload");
 
@@ -60,6 +60,11 @@ router.patch("/delete-home-product/:id" , validateAdminToken , deleteHomeProduct
 
 
 router.get("/get-all-home-products" , validateAdminToken , getAllHomeProducts)
+
+router.post("/add-category" , validateAdminToken , addCategory)
+
+
+router.get("/get-all-category" , validateAdminToken , getCategory)
 
 
 

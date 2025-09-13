@@ -18,6 +18,7 @@ const { deleteImageFile, validateBlogData, validateCarouselData } = require("../
 const CarouselSection = require("../models/carouselSection");
 const contactModel = require("../models/contactModel");
 const  HomeProductModel  = require("../models/homeProductModel");
+const categoryModel = require("../models/categoryModel");
 
 
 
@@ -1708,9 +1709,9 @@ const createHomeProduct =  async (req, res) => {
       return res.status(400).json({ success: false, message: req.fileValidationError });
     }
 
-    const { heading, description } = req.body;
+    const { heading, description , category } = req.body;
 
-    if (!heading || !description) {
+    if (!heading || !description || !category) {
       return res.status(400).json({
         success: false,
         message: "Heading and description are required",
@@ -1731,6 +1732,7 @@ const createHomeProduct =  async (req, res) => {
       image: imagePath,
       heading: heading.trim(),
       description: description.trim(),
+      category: category
     });
 
     const savedProduct = await newProduct.save();
@@ -1754,6 +1756,7 @@ const updateHomeProduct = async (req, res) => {
     let updateData = {
       heading: req.body.heading,
       description: req.body.description,
+      category: req.body.category
     };
 
     // If new image uploaded, replace it
@@ -1808,6 +1811,34 @@ const deleteHomeProduct = async (req, res) => {
 };
 
 
+const addCategory = async (req, res) => {
+  try {
+    const { heading, name } = req.body;
+
+    if (!heading || !name) {
+      return res.status(400).json({ success: false, message: "All fields required" });
+    }
+
+    const newCategory = new categoryModel({ heading, name });
+    await newCategory.save();
+
+    res.status(201).json({ success: true, data: newCategory });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+
+const getCategory = async (req, res) => {
+  try {
+    const categories = await categoryModel.find();
+    res.status(200).json({ success: true, data: categories });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+
 
 module.exports = {
   sendLoginOTP,
@@ -1836,5 +1867,7 @@ module.exports = {
   createHomeProduct,
   updateHomeProduct,
   deleteHomeProduct,
-  getAllHomeProducts
+  getAllHomeProducts,
+  addCategory,
+  getCategory
 };
