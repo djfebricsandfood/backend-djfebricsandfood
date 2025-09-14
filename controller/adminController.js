@@ -1865,6 +1865,24 @@ const getSingleHomeProduct = async (req, res) => {
 };
 
 
+const deleteCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedCategory = await categoryModel.findByIdAndDelete(id);
+
+    if (!deletedCategory) {
+      return res.status(404).json({ success: false, message: "Category not found" });
+    }
+
+    res.status(200).json({ success: true, message: "Category deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+
 module.exports = {
   sendLoginOTP,
   validateOTP,
@@ -1895,5 +1913,6 @@ module.exports = {
   getAllHomeProducts,
   addCategory,
   getCategory,
-  getSingleHomeProduct
+  getSingleHomeProduct,
+  deleteCategory
 };

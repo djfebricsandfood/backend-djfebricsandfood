@@ -53,7 +53,7 @@ const createContact = async (req, res) => {
 
 
    
-    if (!name || !email || !number || !city || !country || !message) {
+    if (!name || !email  || !city || !country || !message) {
       return res.status(400).json({
         success: false,
         message: "All fields are required",
