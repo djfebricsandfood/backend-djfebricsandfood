@@ -1664,6 +1664,35 @@ const getAllContacts = async (req, res) => {
 };
 
 
+const deleteContact = async (req, res) => {
+  try {
+    const { id } = req.params; 
+
+    const deletedContact = await contactModel.findByIdAndDelete(id);
+
+    if (!deletedContact) {
+      return res.status(404).json({
+        success: false,
+        message: "Contact not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Contact deleted successfully",
+      data: deletedContact,
+    });
+  } catch (error) {
+    console.error("Error deleting contact:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error while deleting contact",
+    });
+  }
+};
+
+
+
 
 const sendMailToContact = async (req, res) => {
   try {
@@ -1914,5 +1943,6 @@ module.exports = {
   addCategory,
   getCategory,
   getSingleHomeProduct,
-  deleteCategory
+  deleteCategory,
+  deleteContact
 };

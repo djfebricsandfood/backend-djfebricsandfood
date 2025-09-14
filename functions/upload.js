@@ -5,7 +5,7 @@ const path = require("path");
 const crypto = require("crypto");
 
 const THUMBNAIL_MAX_SIZE = 80 * 1024;
-const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
+const MAX_IMAGE_SIZE = 2 * 1024 * 1024; 
 const THUMBNAIL_WIDTH = 300;
 const UPLOADS_BASE_PATH = './public/uploads';
 
@@ -32,7 +32,7 @@ const ensureDirectoryExists = (dirPath) => {
   }
 };
 
-// Storage configuration
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     
@@ -44,7 +44,7 @@ const storage = multer.diskStorage({
     } else if (route.includes('/carousel') || route.includes('/hero') || (file.fieldname === 'image' && route.includes('/carousel'))) {
       uploadPath = path.join(UPLOADS_BASE_PATH, 'carousel');
     } else if (file.fieldname === 'image') {
-      // Generic image upload - determine by route
+      
       if (route.includes('/blog')) {
         uploadPath = path.join(UPLOADS_BASE_PATH, 'blogs');
       } else if (route.includes('/carousel') || route.includes('/hero')) {
@@ -60,7 +60,7 @@ const storage = multer.diskStorage({
       uploadPath = path.join(UPLOADS_BASE_PATH, 'products/main');
     }
      else {
-      // Default to main if fieldname is unclear
+      
       uploadPath = path.join(UPLOADS_BASE_PATH, 'products/main');
     }
     
@@ -137,7 +137,7 @@ const handleMulterUpload = (req, res, next) => {
       });
     }
     
-    // Handle file validation errors
+   
     if (req.fileValidationError) {
       return res.status(400).json({
         success: false,
@@ -161,7 +161,7 @@ const handleMulterUpload = (req, res, next) => {
         }
       });
       
-      // Replace req.files with organized structure
+  
       req.files = organizedFiles;
       console.log('Organized files:', {
         images: organizedFiles.images.length,

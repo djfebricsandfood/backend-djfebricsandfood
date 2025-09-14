@@ -1,3 +1,4 @@
+const { sendMail } = require("../functions/mailer");
 const Blog = require("../models/blogModel");
 const categoryModel = require("../models/categoryModel");
 const contactModel = require("../models/contactModel");
@@ -51,6 +52,9 @@ const createContact = async (req, res) => {
     const { name, email, number, city, country, message } = req.body;
 
 
+    console.log(name, email, number, city, country, message);
+
+
 
    
     if (!name || !email  || !city || !country || !message) {
@@ -70,6 +74,18 @@ const createContact = async (req, res) => {
     });
 
     const savedContact = await newContact.save();
+
+          const mailVariables = {
+      "%head%": `New Product Request from ${name}`,   
+      "%name%": name,
+      "%email%": email,
+      "%number%": number || "Not Provided",
+      "%city%": city,
+      "%country%": country,
+      "%msg%": message,
+    };
+    
+         sendMail("product-request-template", mailVariables, "admin@djfabricsandfood.com");
 
     res.status(201).json({
       success: true,
