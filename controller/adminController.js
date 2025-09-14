@@ -1770,7 +1770,7 @@ const updateHomeProduct = async (req, res) => {
       updateData.image = path.join("uploads/products", req.file.filename).replace(/\\/g, "/");
     }
 
-    const updatedProduct = await homeProductModel.findByIdAndUpdate(id, updateData, {
+    const updatedProduct = await HomeProductModel.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
     });
