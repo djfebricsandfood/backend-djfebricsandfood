@@ -66,7 +66,7 @@ router.post("/add-category" , validateAdminToken , addCategory)
 
 router.get("/get-all-category" , validateAdminToken , getCategory)
 
-router.patch("/delete-category" , validateAdminToken , deleteCategory)
+router.patch("/delete-category/:id" , validateAdminToken , deleteCategory)
 
 
 router.get("/get-home-product-by-id/:id" , validateAdminToken , getSingleHomeProduct)
