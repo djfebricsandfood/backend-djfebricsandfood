@@ -1722,14 +1722,16 @@ let imagePath = "";
 
 if (req.files && req.files.images && req.files.images.length > 0) {
   imagePath = req.files.images[0].path
-    .replace(/\\/g, "/")      // fix Windows slashes
-    .replace("public/", "");  // remove "public/"
+    .replace(/\\/g, "/")      
+    .replace("public/", "");  
 } else {
   return res.status(400).json({
     success: false,
     message: "Image is required",
   });
 }
+
+
 
 
     const newProduct = new HomeProductModel({
@@ -1844,6 +1846,25 @@ const getCategory = async (req, res) => {
 
 
 
+// Get single product by ID
+const getSingleHomeProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const product = await HomeProductModel.findById(id);
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    res.json({ success: true, data: product });
+  } catch (error) {
+    console.error("Get single product error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+
 module.exports = {
   sendLoginOTP,
   validateOTP,
@@ -1873,5 +1894,6 @@ module.exports = {
   deleteHomeProduct,
   getAllHomeProducts,
   addCategory,
-  getCategory
+  getCategory,
+  getSingleHomeProduct
 };
