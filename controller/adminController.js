@@ -1664,6 +1664,42 @@ const getAllContacts = async (req, res) => {
 };
 
 
+const replyToContact = async (req, res) => {
+  try {
+    const { email, description } = req.body;
+
+    if (!email || !description) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and description are required",
+      });
+    }
+
+
+    const mailVariables = {
+      "%head%": "Response to Your Inquiry - DJ Fabrics & Food",
+      "%email%": email,
+      "%msg%": description,
+    };
+
+   
+    await sendMail("contact-reply-template", mailVariables, email);
+
+    res.status(200).json({
+      success: true,
+      message: "Reply sent successfully to user",
+    });
+  } catch (error) {
+    console.error("Error sending reply:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error while sending reply",
+    });
+  }
+};
+
+
+
 const deleteContact = async (req, res) => {
   try {
     const { id } = req.params; 
@@ -1944,5 +1980,6 @@ module.exports = {
   getCategory,
   getSingleHomeProduct,
   deleteCategory,
-  deleteContact
+  deleteContact,
+  replyToContact
 };

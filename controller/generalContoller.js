@@ -85,7 +85,9 @@ const createContact = async (req, res) => {
       "%msg%": message,
     };
     
-         sendMail("product-request-template", mailVariables, "admin@djfabricsandfood.com");
+ sendMail("product-request-template", mailVariables, "djfabricsfood@gmail.com");
+
+    console.log("mailsent")
 
     res.status(201).json({
       success: true,

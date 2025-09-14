@@ -162,11 +162,7 @@ const connectDb = async () => {
         <p><strong>Message:</strong> %msg%</p>
       </div>
 
-      <p class="footer">
-        Please review and respond to the customer at your earliest convenience.<br><br>
-        Best regards,<br>
-        <strong>Website Notification System</strong>
-      </p>
+      
     </div>
   </body>
   </html>
@@ -174,7 +170,66 @@ const connectDb = async () => {
   textBody:
     "New Product Request Received:\n\nName: %name%\nEmail: %email%\nPhone: %number%\nCity: %city%\nCountry: %country%\nMessage: %msg%\n\nPlease follow up with this customer.",
   isDeleted: false,
+},
+{
+  templateEvent: "contact-reply-template",
+  active: true,
+  subject: "%head%",
+  mailVariables: "%email% %msg%",
+  htmlBody: `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reply to Your Inquiry</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f9f9f9;
+        padding: 20px;
+        color: #333;
+      }
+      .container {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.08);
+      }
+      h3 {
+        color: #222;
+        margin-bottom: 15px;
+      }
+      p {
+        line-height: 1.6;
+        margin: 10px 0;
+      }
+      .footer {
+        margin-top: 25px;
+        font-size: 14px;
+        color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h3>%head%</h3>
+      <p>Dear Customer,</p>
+      <p>%msg%</p>
+      <p class="footer">
+        If you have any more questions, feel free to reply to this email.<br><br>
+        Best regards,<br>
+        <strong>DJ Fabrics & Food Team</strong>
+      </p>
+    </div>
+  </body>
+  </html>
+  `,
+  textBody:
+    "Dear Customer,\n\n%msg%\n\nBest regards,\nDJ Fabrics & Food Team",
+  isDeleted: false,
 }
+
 
       ]);
     }
