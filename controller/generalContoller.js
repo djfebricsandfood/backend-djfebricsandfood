@@ -12,7 +12,7 @@ const getAllProductsForUser = async (req, res) => {
   
   try {
     const products = await product.aggregate([
-      { $match: { category: category } },
+      { $match: { category: category  , isDeleted : false} },
       { $sort: { createdAt: -1 } },
       { 
         $project: { 
@@ -119,7 +119,7 @@ const getProductById = async (req, res) => {
       });
     }
 
-    console.log('Get product by ID response:', productData);
+   
 
     res.status(200).json({
       success: true,
